@@ -36,6 +36,7 @@ public class Database {
         Database.daftarJadwal.add(new Jadwal(18, 11, 2023, 10, 0, 11, 0));
         Database.daftarJadwal.add(new Jadwal(15, 11, 2023, 10, 0, 11, 0));
         Database.daftarJadwal.add(new Jadwal(16, 11, 2023, 10, 0, 11, 0));
+        Database.daftarJadwal.add(new Jadwal(16, 11, 2023, 20, 0, 21, 0));
     }
 
     // public Linked

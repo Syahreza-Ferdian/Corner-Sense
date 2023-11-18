@@ -45,16 +45,44 @@ public class Jadwal {
         return start;
     }
 
+    public int getTanggal(Calendar c) {
+        return c.get(Calendar.DAY_OF_MONTH);
+    }
+
+    public int getBulan(Calendar c) {
+        return c.get(Calendar.MONTH) + 1;
+    }
+
+    public int getTahun(Calendar c) {
+        return c.get(Calendar.YEAR);
+    }
+
+    public int getJam(Calendar c) {
+        return c.get(Calendar.HOUR);
+    }
+
+    public int getMinute(Calendar c) {
+        return c.get(Calendar.MINUTE);
+    }
+
+    public String getAMPM(Calendar c) {
+        return c.get(Calendar.AM_PM) == 1 ? "PM" : "AM";
+    }
+
     public void showJadwal() {
         int count = 0;
-        System.out.printf("\n%4s%3s%16s%9s%13s%8s%12s%7s\n", "No", "|", "Hari, Tgl", "|", "Waktu", "|", "Status", "|");
-        System.out.println("------------------------------------------------------------------------");
+        System.out.printf("\n%4s%3s%16s%9s%16s%12s%12s%7s\n", "No", "|", "Hari, Tgl", "|", "Waktu", "|", "Status", "|");
+        System.out.println("-------------------------------------------------------------------------------");
         // System.out.printf("%4d%3s%21s%4s%16s%5s%14s%5s\n", 1, "|", String.format("%s, %02d-%02d-%d", "Rabu", 5, 11, 2023), "|", String.format("%02d:%02d - %02d:%02d", 9, 0, 10, 0), "|", "Not Available", "|");
+        
         for(Jadwal jdwl : Database.daftarJadwal) {
-            System.out.printf("%4d%3s%21s%4s%16s%5s%14s%5s\n",
+            Calendar startDate = jdwl.start;
+            Calendar endDate = jdwl.end;
+
+            System.out.printf("%4d%3s%21s%4s%23s%5s%14s%5s\n",
                 ++count, "|",
-                String.format("%s, %02d-%02d-%d", jdwl.getHari(), jdwl.start.get(Calendar.DAY_OF_MONTH), jdwl.start.get(Calendar.MONTH) + 1, jdwl.start.get(Calendar.YEAR)), "|",
-                String.format("%02d:%02d - %02d:%02d", jdwl.start.get(Calendar.HOUR), jdwl.start.get(Calendar.MINUTE), jdwl.end.get(Calendar.HOUR), jdwl.end.get(Calendar.MINUTE)), "|", 
+                String.format("%s, %02d-%02d-%d", jdwl.getHari(), jdwl.getTanggal(startDate), jdwl.getBulan(startDate), jdwl.getTahun(startDate)), "|",
+                String.format("%02d:%02d %s - %02d:%02d %s", jdwl.getJam(startDate), jdwl.getMinute(startDate), jdwl.getAMPM(startDate), jdwl.getJam(endDate), jdwl.getMinute(endDate), jdwl.getAMPM(endDate)), "|", 
                 jdwl.isAvailable() ? "Available" : "Not Available", "|"    
             );
         }
