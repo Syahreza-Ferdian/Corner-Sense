@@ -113,10 +113,10 @@ public class User {
         final int MAX_POSSIBLE_USER_INPUT = 6;
 
         inputCycle: while (true) {
-            System.out.println("=============================================");
+            System.out.println("\n=============================================");
             System.out.printf("Selamat datang %s\n", this.getUsername());
-            System.out.println("Menu Corner Sense: ");
-            System.out.printf("%s\n%s\n%s\n%s\n%s\n",
+            System.out.println("\nMenu Corner Sense: ");
+            System.out.printf("%s\n%s\n%s\n%s\n%s\n%s\n",
                 "1. Lihat Jadwal",
                 "2. Booking Online",
                 "3. Lihat detail device",
@@ -139,7 +139,11 @@ public class User {
             }
 
             switch(this.userMenuChoice) {
-                case 5:
+                case 1:
+                    Jadwal jdw = new Jadwal();
+                    jdw.showJadwal();
+                    break;
+                case MAX_POSSIBLE_USER_INPUT:
                     this.stopUserInput = true;
                     break inputCycle;
             }

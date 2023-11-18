@@ -4,8 +4,8 @@ public class Register {
     private final Scanner sc = new Scanner(System.in);
     private String inputUsername;
     private String inputPassword;
-    private String inputNim;
-    private String inputEmail;
+    // private String inputNim;
+    // private String inputEmail;
 
 
     public void prompt() {

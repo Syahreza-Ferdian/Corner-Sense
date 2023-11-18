@@ -24,25 +24,25 @@ public class Login {
             boolean isPasswordValid = isUsernameValid ? Database.daftarUsers.get(Database.daftarUsers.indexOf(userAttemptToLogin)).authenticatePass(inputPassword) : false;
 
             if(loginAttempts == 3 && (!isUsernameValid || !isPasswordValid)) {
-                System.out.println("\nToo many failed login attempts");
+                System.out.printf("\n%s%sToo many failed login attempts%s\n", AnsiColor.RED_BACKGROUND, AnsiColor.WHITE_BOLD, AnsiColor.RESET);
                 System.out.println("Pilih menu login kembali!");
                 break;
             }
 
             if(!isUsernameValid) {
-                System.out.println("\nUsername belum terdaftar atau username yang Anda masukkan salah");
+                System.out.printf("\n%s%sUsername belum terdaftar atau username yang Anda masukkan salah\n%s", AnsiColor.RED_BACKGROUND, AnsiColor.WHITE_BOLD, AnsiColor.RESET);
                 ++loginAttempts;
                 continue;
             }
 
             if(!isPasswordValid) {
-                System.out.println("\nPassword yang Anda masukkan salah!");
+                System.out.printf("\n%s%sPassword yang Anda masukkan salah!%s\n", AnsiColor.RED_BACKGROUND, AnsiColor.WHITE_BOLD, AnsiColor.RESET);
                 ++loginAttempts;
                 continue;
             }
 
             // BERHASIL MASUK KE SISTEM
-            System.out.println("\nUSERINFO: Successfully logged in!");
+            System.out.printf("\n%s%sUSERINFO: Successfully logged in!%s\n", AnsiColor.GREEN_BACKGROUND, AnsiColor.WHITE_BOLD, AnsiColor.RESET);
             isLoginSuccessfull = true;
             usr = Database.daftarUsers.get(Database.daftarUsers.indexOf(userAttemptToLogin));
             break;
@@ -59,7 +59,7 @@ public class Login {
         this.usr = prompt();
     }
 
-    public void userAction() {
+    public void onUserLoggedInCallback() {
         if(this.usr.getUsername().equals("Guest")) {
             this.usr.setStopUserInput(true);
         } else {
