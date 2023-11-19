@@ -1,10 +1,10 @@
 import java.util.Scanner;
 
+@SuppressWarnings("unused")
+
 public class Main {
     public static void main(String[] args) {
         Database db = new Database();
-        db.initializeDummyUserData();
-        db.initializeDummyJadwalData();
 
         Scanner sc = new Scanner(System.in);
 

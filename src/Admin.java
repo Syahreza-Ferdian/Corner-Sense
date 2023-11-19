@@ -1,4 +1,5 @@
 import java.util.Scanner;
+import java.time.format.DateTimeFormatter;
 
 public class Admin extends User {
     private final Scanner sc = new Scanner(System.in);
@@ -10,7 +11,7 @@ public class Admin extends User {
     @Override
     public void prompt() {
         int admInputChoice;
-        final int MAX_POSSIBLE_ADM_INPUT = 6;
+        final int MAX_POSSIBLE_ADM_INPUT = 8;
 
         inputCycle: while (true) {
             System.out.printf("\n%s%sAnda login sebagai Admin%s\n", AnsiColor.YELLOW_BACKGROUND, AnsiColor.WHITE_BOLD, AnsiColor.RESET);
@@ -18,16 +19,18 @@ public class Admin extends User {
             System.out.println(">>> ADMIN DASHBOARD <<<");
             System.out.printf("Selamat datang admin %s%s%s\n", AnsiColor.RED, this.getUsername(), AnsiColor.RESET);
             System.out.printf("\n%sAdministrative Controls: %s\n", AnsiColor.CYAN_BOLD, AnsiColor.RESET);
-            System.out.printf("%s\n%s\n%s\n%s\n%s\n", 
+            System.out.printf("%s\n%s\n%s\n%s\n%s\n%s\n%s\n", 
                 "1. Tambah Jadwal",
                 "2. Lihat Semua Jadwal",
                 "3. Lihat Akun Terdaftar",
-                "4. Corner Pass", 
-                "5. Logout"
+                "4. Lihat Semua Booking Aktif",
+                "5. Corner Pass", 
+                "6. Respond Feedback",
+                "7. Logout"
             );
             System.out.printf("\n%sAdditional: %s\n", AnsiColor.CYAN_BOLD, AnsiColor.RESET);
-            System.out.println("6. Login sebagai User biasa.");
-            System.out.print("Input [1/2/3/4/5]: ");
+            System.out.println("8. Login sebagai User biasa.");
+            System.out.printf("Input [1 - %d]: ", MAX_POSSIBLE_ADM_INPUT);
 
             try {
                 admInputChoice = sc.nextInt();
@@ -56,12 +59,18 @@ public class Admin extends User {
                 case 3:
                     this.showAllUsers();
                     break;
-                case 5:
-                    break inputCycle;
+                case 4:
+                    this.showAllBookings();
+                    break;
                 case 6:
+                    this.respondFeedback();
+                    break;
+                case 7:
+                    break inputCycle;
+                case MAX_POSSIBLE_ADM_INPUT:
                     System.out.printf("\n%s%sBerpindah tampilan sebagai user biasa...%s\n", AnsiColor.YELLOW_BACKGROUND, AnsiColor.WHITE_BOLD, AnsiColor.RESET);
                     super.prompt();
-                    break;
+                    break inputCycle;
             }
         }
     }
@@ -110,7 +119,7 @@ public class Admin extends User {
                 System.out.printf("\n%s%sBerhasil menambahkan jadwal baru!%s\n", AnsiColor.GREEN_BACKGROUND, AnsiColor.WHITE_BOLD, AnsiColor.RESET);
                 break;
             } else {
-                System.out.printf("\n%s%sTerjadi kesalahan dalam penambahan jadwal!%s\n", AnsiColor.RED_BACKGROUND, AnsiColor.WHITE_BOLD, AnsiColor.RESET);
+                System.out.printf("\n%s%sJadwal yang anda tambahkan sudah ada di database!%s\n", AnsiColor.RED_BACKGROUND, AnsiColor.WHITE_BOLD, AnsiColor.RESET);
                 continue;
             }
         }
@@ -127,11 +136,82 @@ public class Admin extends User {
         }
     }
 
+    public void showAllBookings() {
+        int counter = 0;
+        System.out.printf("\n%sDaftar semua booking aktif: %s\n", AnsiColor.CYAN_BOLD, AnsiColor.RESET);
+        for (Booking bkg : Database.daftarBookings) {
+            Jadwal currentJadwal = bkg.getJadwal();
+            System.out.printf("\n%d. Kode Booking\t: %s\n", ++counter, bkg.getKodeBooking());
+            System.out.printf("%3sUser\t\t: %s\n", "", bkg.getUser().getUsername());
+            System.out.printf("%3sStation\t: %d\n", "", bkg.getStation().getStationID());
+            System.out.printf("%3sJam\t\t: %s - %s\n", "", currentJadwal.formatJam(currentJadwal.getStart()), currentJadwal.formatJam(currentJadwal.getEnd()));
+            System.out.printf("%3sHari, Tgl\t: %s, %s\n", "", currentJadwal.getHari(), currentJadwal.formatTanggal(currentJadwal.getStart()));
+        }
+    }
 
+    public void respondFeedback() {
+        int counter = 0;
+        int respondChoice;
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm:ss a");
+        
+        if (Database.daftarFeedbacks.size() == 0) {
+            System.out.printf("\n%s%sTidak ada pesan feedback di database!%s\n", AnsiColor.RED_BACKGROUND, AnsiColor.WHITE_BOLD, AnsiColor.RESET);
+            return;
+        }
+
+        inputCycle: while(true) {
+            System.out.printf("\nPilih Feedback yang ingin Anda respon: ");
+            for (Feedback fdbk : Database.daftarFeedbacks) {
+                System.out.printf("\n%d. Requested by\t\t: %s\n", ++counter, fdbk.getRequestedBy().getUsername());
+                System.out.printf("%3sPesan Feedback\t: %s\n", "", fdbk.getFeedbackMsg());
+                System.out.printf("%3sRequested On\t\t: %s\n", "", fdbk.getrequestedOn().format(dtf));
+                System.out.printf("%3sResponded By\t\t: %s\n", "", fdbk.isResponded() ? fdbk.getRespondedBy().getUsername() : "-");
+            }
+            System.out.printf("Input [1 - %d]: ", Database.daftarFeedbacks.size());
+
+            try {
+                respondChoice = sc.nextInt();
+                if (respondChoice < 1 || respondChoice > Database.daftarFeedbacks.size()) {
+                    throw new Exception();
+                }
+                sc.nextLine();
+            } catch (Exception e) {
+                sc.nextLine();
+                System.out.printf("\n%s%sSistem menerima input yang tidak valid. Harap masukkan input sesuai dengan nomor feedback!%s\n",
+                    AnsiColor.RED_BACKGROUND,
+                    AnsiColor.WHITE_BOLD,
+                    AnsiColor.RESET
+                );
+                continue inputCycle;
+            }
+
+            if (Database.daftarFeedbacks.get(respondChoice - 1).isResponded()) {
+                System.out.printf("\n%s%sFeedback tersebut sudah direspond oleh Admin lain!%s\n", AnsiColor.RED_BACKGROUND, AnsiColor.WHITE_BOLD, AnsiColor.RESET);
+                break inputCycle;
+            }
+
+            System.out.printf("\nMasukkan pesan respon di bawah ini: \n");
+            System.out.printf("%3s> ", "");
+            String respondMsg = sc.nextLine();
+
+            Database.daftarFeedbacks.get(respondChoice - 1).setRespondMsg(respondMsg);
+            Database.daftarFeedbacks.get(respondChoice - 1).setRespondedBy(this);
+
+            System.out.printf("\n%s%sPesan respon berhasil disimpan!%s\n", AnsiColor.GREEN_BACKGROUND, AnsiColor.WHITE_BOLD, AnsiColor.RESET);
+            break inputCycle;
+        }
+    }
 
     // public static void main(String[] args) {
-    //     Admin adm = new Admin("syah", "Reza");
-    //     // adm.prompt();
-    //     adm.showAllUsers();
+    //     Database db = new Database();
+    //     User usr = Database.daftarUsers.get(0);
+    //     Jadwal jdwl = Database.daftarJadwal.get(0);
+    //     Station sts = Database.daftarStation.get(3);
+
+    //     Booking bkg = new Booking(usr, jdwl, sts);
+    //     Database.daftarBookings.add(bkg);
+
+    //     Admin adm = new Admin("Syahreza", "123");
+    //     adm.prompt();
     // }
 }

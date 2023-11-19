@@ -1,5 +1,7 @@
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
+// @SuppressWarnings("unused")
 public class User {
     private final Scanner sc = new Scanner(System.in);
 
@@ -11,6 +13,7 @@ public class User {
     private JenisKelamin jenisKelamin;
     private int userMenuChoice;
     private boolean stopUserInput;
+    private Jadwal userSelectedJdwlBooking;
 
     private enum JenisKelamin {
         LAKI_LAKI,
@@ -110,21 +113,27 @@ public class User {
     }
 
     public void prompt() {
-        final int MAX_POSSIBLE_USER_INPUT = 6;
+        final int MAX_POSSIBLE_USER_INPUT = 8;
 
         inputCycle: while (true) {
             System.out.println("\n=============================================");
             System.out.printf("Selamat datang %s\n", this.getUsername());
+
+            @SuppressWarnings("unused")
+            Notifikasi ntf = new Notifikasi(this);
+
             System.out.println("\nMenu Corner Sense: ");
-            System.out.printf("%s\n%s\n%s\n%s\n%s\n%s\n",
+            System.out.printf("%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
                 "1. Lihat Jadwal",
                 "2. Booking Online",
-                "3. Lihat detail device",
+                "3. Lihat Booking",
                 "4. Cancel Booking",
-                "5. Kritik dan Saran",
-                "6. Logout"
+                "5. Lihat detail device",
+                "6. Corner Pass",
+                "7. Kritik dan Saran",
+                "8. Logout"
             );
-            System.out.print("Input [1/2/3/4/5]: ");
+            System.out.printf("Input [1 - %d]: ", MAX_POSSIBLE_USER_INPUT);
             
             try {
                 this.userMenuChoice = sc.nextInt();
@@ -140,14 +149,200 @@ public class User {
 
             switch(this.userMenuChoice) {
                 case 1:
-                    Jadwal jdw = new Jadwal();
-                    jdw.showJadwal();
+                    this.lihatJadwal();
+                    break;
+                case 2:
+                    this.booking();
+                    break;
+                case 3:
+                    this.showUserDetailBooking();
+                    break;
+                case 4:
+                    this.cancelBooking();
+                    break;
+                case 7:
+                    this.giveFeedback();
                     break;
                 case MAX_POSSIBLE_USER_INPUT:
                     this.stopUserInput = true;
                     break inputCycle;
             }
         }
+    }
+
+    public void lihatJadwal() {
+        System.out.printf("\n%sJadwal yang tersedia:%s\n", AnsiColor.CYAN, AnsiColor.RESET);
+        Jadwal jdw = new Jadwal();
+        jdw.showJadwal();
+    }
+ 
+    public boolean isUserHasBooking() {
+        for(Booking bkg : Database.daftarBookings) {
+            if (bkg.getUser().getUsername().equals(this.username)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void showUserDetailBooking() {
+        if (!isUserHasBooking()) {
+            System.out.printf("\n%s%sAnda tidak memiliki booking aktif!%s\n", AnsiColor.RED_BACKGROUND, AnsiColor.WHITE_BOLD, AnsiColor.RESET);
+            System.out.println("Pilih menu \'Booking Online\' untuk membuat booking baru!");
+            return;
+        }
+
+        for(Booking bkg : Database.daftarBookings) {
+            if (bkg.getUser().getUsername().equals(this.username)) {
+                bkg.showBookingDetails();
+                break;
+            }
+        }
+    }
+
+    public void booking() {
+        int userJadwalInputChoice;
+
+        if (this.isUserHasBooking()) {
+            System.out.printf("\n%s%sAnda sudah memiliki booking aktif!%s\n", AnsiColor.RED_BACKGROUND, AnsiColor.WHITE_BOLD, AnsiColor.RESET);
+            return;
+        }
+
+        inputCycle: while(true) {
+            lihatJadwal();
+            System.out.print("\nPilih salah satu jadwal yang anda inginkan: ");
+
+            try {
+                userJadwalInputChoice = sc.nextInt();
+                if (userJadwalInputChoice < 1 || userJadwalInputChoice > Database.daftarJadwal.size()) {
+                    throw new Exception();
+                }
+                sc.nextLine();
+            } catch (Exception e) {
+                sc.nextLine();
+                System.out.printf("\n%s%sSistem menerima input yang tidak valid. Harap masukkan input sesuai dengan nomor pada jadwal!%s\n",
+                    AnsiColor.RED_BACKGROUND,
+                    AnsiColor.WHITE_BOLD,
+                    AnsiColor.RESET
+                );
+                continue inputCycle;
+            }
+
+            userSelectedJdwlBooking = Database.daftarJadwal.get(userJadwalInputChoice - 1);
+            userSelectedJdwlBooking.showStations();
+            System.out.printf("\n%d. Kembali\n", Database.daftarStation.size() + 1);
+            System.out.print("\nPilih station number yang Anda inginkan: ");
+            int userStationNumberInput, indexStationInDb = -1;
+
+            try {
+                userStationNumberInput = sc.nextInt();
+
+                if (userStationNumberInput == Database.daftarStation.size() + 1) {
+                    break inputCycle;
+                }
+
+                if (userStationNumberInput < 1 || userStationNumberInput > Database.daftarStation.size() + 1) {
+                    throw new InputMismatchException();
+                }
+                indexStationInDb = Database.daftarStation.indexOf(new Station(userStationNumberInput));
+
+                if (Database.daftarStation.get(indexStationInDb).isOccupied()) {
+                    throw new Exception();
+                }
+                sc.nextLine();
+
+            } catch (InputMismatchException e) {
+                sc.nextLine();
+                System.out.printf("\n%s%sSistem menerima input yang tidak valid. Harap masukkan input sesuai dengan nomor stationl!%s\n",
+                    AnsiColor.RED_BACKGROUND,
+                    AnsiColor.WHITE_BOLD,
+                    AnsiColor.RESET
+                );
+                continue;
+
+            } catch (Exception e) {
+                sc.nextLine();
+                System.out.printf("\n%s%sSudah ada orang lain yang mem-booking station tersebut!%s\n",
+                    AnsiColor.RED_BACKGROUND,
+                    AnsiColor.WHITE_BOLD,
+                    AnsiColor.RESET
+                );
+                continue;
+            }
+
+            if (indexStationInDb != -1) {
+                Station stationSelected = Database.daftarStation.get(indexStationInDb);
+                Database.daftarStation.get(indexStationInDb).setUsedBy(this);
+                Booking bk = new Booking(this, userSelectedJdwlBooking, stationSelected);
+                Database.daftarBookings.add(bk);
+
+                System.out.printf("\n%s%sBooking berhasil!%s\n", AnsiColor.GREEN_BACKGROUND, AnsiColor.WHITE_BOLD, AnsiColor.RESET);
+                break inputCycle;
+            }
+        }
+    }
+
+    public void cancelBooking() {
+        if (!this.isUserHasBooking()) {
+            System.out.printf("\n%s%sAnda tidak mempunyai booking aktif!%s\n", AnsiColor.RED_BACKGROUND, AnsiColor.WHITE_BOLD, AnsiColor.RESET);
+            return;
+        }
+        Booking userBkg = null;
+
+        for(Booking bkg : Database.daftarBookings) {
+            if (bkg.getUser().getUsername().equals(this.username)) {
+                userBkg = bkg;
+                break;
+            }
+        }
+
+        System.out.printf("\nSistem mendeteksi Anda memiliki booking aktif pada %s, %s %s di Station Number %d\n", userBkg.getJadwal().getHari(), userBkg.getJadwal().formatTanggal(userBkg.getJadwal().getStart()), userBkg.getJadwal().formatJam(userBkg.getJadwal().getStart()), userBkg.getStation().getStationID());
+        inputConfirmCycle: while(true) {
+            System.out.println("Apakah anda yakin ingin membatalkan booking tersebut?");
+            System.out.print("> Y/N: ");
+            char userConfirm;
+
+            try {
+                userConfirm = sc.nextLine().toLowerCase().charAt(0);
+            } catch (Exception e) {
+                System.out.printf("\n%s%sSistem menerima input yang tidak valid. Harap masukkan input hanya Y atau N!%s\n",
+                    AnsiColor.RED_BACKGROUND,
+                    AnsiColor.WHITE_BOLD,
+                    AnsiColor.RESET
+                );
+                continue inputConfirmCycle;
+            }
+
+            switch(userConfirm) {
+                case 'y':
+                    Database.daftarBookings.remove(Database.daftarBookings.indexOf(userBkg));
+                    System.out.printf("\n%s%sBooking tersebut berhasil dibatalkan!%s\n", 
+                        AnsiColor.GREEN_BACKGROUND,
+                        AnsiColor.WHITE_BOLD,
+                        AnsiColor.RESET
+                    );
+                    System.out.println("Anda bisa membuat booking baru jika diinginkan");
+                    break inputConfirmCycle;
+                case 'n':
+                    break inputConfirmCycle;
+            }
+        }
+    }
+
+    public void giveFeedback() {
+        System.out.printf("\n%sSilakan ketik pesan feedback di bawah ini: %s\n", AnsiColor.CYAN_BOLD, AnsiColor.RESET);
+        System.out.printf("%3s> ", "");
+        String feedbackMsg = sc.nextLine();
+
+        Feedback userFeedback = new Feedback(this, feedbackMsg);
+        Database.daftarFeedbacks.add(userFeedback);
+        
+        System.out.printf("\n%s%sFeedback yang Anda masukkan berhasil disimpan%s\n", 
+            AnsiColor.GREEN_BACKGROUND,
+            AnsiColor.WHITE_BOLD,
+            AnsiColor.RESET
+        );
+        System.out.println("\nKami akan meneruskan feedback Anda ke Admin dan Developer untuk pengembangan layanan kami kedepannya\n");
     }
 
     @Override
