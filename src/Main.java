@@ -59,7 +59,6 @@ public class Main {
                     break mainMenuInputCycle;
             }
         }
-
         sc.close();
     }
 }

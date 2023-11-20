@@ -160,6 +160,9 @@ public class User {
                 case 4:
                     this.cancelBooking();
                     break;
+                case 5:
+                    this.showDeviceDetails();
+                    break;
                 case 7:
                     this.giveFeedback();
                     break;
@@ -344,6 +347,39 @@ public class User {
         );
         System.out.println("\nKami akan meneruskan feedback Anda ke Admin dan Developer untuk pengembangan layanan kami kedepannya\n");
     }
+
+    public void showDeviceDetails() {
+        inputCycle: while(true) {
+            System.out.printf("\n%sDaftar Station: %s\n", AnsiColor.CYAN_BOLD, AnsiColor.RESET);
+            for (Station sts : Database.daftarStation) {
+                System.out.printf("%d. %s\n", sts.getStationID(), sts.getStationName());
+            }
+            System.out.print("Pilih Station Number yang ingin Anda lihat detailnya: ");
+            int userSelection;
+
+            try {
+                userSelection = sc.nextInt();
+                if (userSelection < 1 || userSelection > Database.daftarStation.size()) {
+                    throw new Exception();
+                }
+                sc.nextLine();
+            } catch (Exception e) {
+                sc.nextLine();
+                System.out.printf("\n%s%sSistem menerima input yang tidak valid. Harap masukkan input sesuai dengan nomor station%s\n",
+                    AnsiColor.RED_BACKGROUND,
+                    AnsiColor.WHITE_BOLD,
+                    AnsiColor.RESET
+                );
+                continue inputCycle;
+            }
+
+            Station selected = Database.daftarStation.get(userSelection - 1);
+            selected.showDetailsStation();
+            break inputCycle;
+        }
+    }
+
+    // TODO: SYSTEM CORNER PASS & TAMBAHIN INPUT BUAT REQUEST GAME
 
     @Override
     public boolean equals(Object obj) {
