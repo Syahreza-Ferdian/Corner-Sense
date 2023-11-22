@@ -56,6 +56,9 @@ public class Main {
                         AnsiColor.WHITE_BOLD,
                         AnsiColor.RESET
                     );
+                    for(CornerPass cp : Database.daftarPelangganCornerPass) {
+                        cp.shutdownScheduler();
+                    }
                     break mainMenuInputCycle;
             }
         }

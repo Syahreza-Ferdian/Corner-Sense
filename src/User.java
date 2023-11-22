@@ -163,6 +163,9 @@ public class User {
                 case 5:
                     this.showDeviceDetails();
                     break;
+                case 6:
+                    this.cornerPass();
+                    break;
                 case 7:
                     this.giveFeedback();
                     break;
@@ -380,6 +383,142 @@ public class User {
     }
 
     // TODO: SYSTEM CORNER PASS & TAMBAHIN INPUT BUAT REQUEST GAME
+    
+    public void cornerPass() {
+        inputCycle: while(true) {
+            System.out.printf("Corner Pass Menu: \n%s\n%s\n%s\n", 
+                "1. Subscribe to Corner Pass",
+                "2. Lihat status subscription",
+                "3. Kembali"
+            );
+            System.out.print("Input [1/2/3]: ");
+            int userInput;
+
+            try {
+                userInput = sc.nextInt();
+                if (userInput < 1 || userInput > 3) {
+                    throw new Exception();
+                }
+                sc.nextLine();
+            } catch (Exception e) {
+                sc.nextLine();
+                System.out.printf("\n%s%sSistem menerima input yang tidak valid. Harap masukkan input sesuai pada menu%s\n",
+                    AnsiColor.RED_BACKGROUND,
+                    AnsiColor.WHITE_BOLD,
+                    AnsiColor.RESET
+                );
+                continue inputCycle;
+            }
+
+            switch (userInput) {
+                case 1:
+                    CornerPass cp = new CornerPass();
+                    cornerPassInputChoiceCycle: while(true) {
+                        cp.showPackageDetails();
+                        System.out.printf("%d. Batal\n", paket.values().length  + 1);
+                        System.out.print("\nMasukkan input paket Corner Pass yang Anda inginkan: ");
+                        int userPckgChoice;
+
+                        try {
+                            userPckgChoice = sc.nextInt();
+                            if (userPckgChoice < 1 || userPckgChoice > paket.values().length) {
+                                throw new Exception();
+                            }
+                            sc.nextLine();
+                        } catch (Exception e) {
+                            sc.nextLine();
+                            System.out.printf("\n%s%sSistem menerima input yang tidak valid. Harap masukkan input sesuai pada menu%s\n",
+                                AnsiColor.RED_BACKGROUND,
+                                AnsiColor.WHITE_BOLD,
+                                AnsiColor.RESET
+                            );
+                            continue cornerPassInputChoiceCycle;
+                        }
+                        
+                        paket selected = null;
+
+                        switch(userPckgChoice) {
+                            case 1:
+                                selected = paket.Elite;
+                                break;
+                            case 2:
+                                selected = paket.Master;
+                                break;
+                            case 3:
+                                selected = paket.Legend;
+                                break;
+                            default:
+                                break cornerPassInputChoiceCycle;
+                        }
+
+                        cp = new CornerPass(this, selected);
+
+                        paymentChoiceCycle: while(true) {
+                            System.out.printf("\n%sPilih metode pembayaran: %s\n", AnsiColor.WHITE_BOLD, AnsiColor.RESET);
+                            System.out.printf("%s\n%s\n%s\n", "1. QRIS", "2. Kartu Kredit", "3. Kartu Debit");
+                            System.out.print("Input [1/2/3]: ");
+                            int userPymtChoice;
+
+                            try {
+                                userPymtChoice = sc.nextInt();
+                                if (userPymtChoice < 1 || userPymtChoice > 3) {
+                                    throw new Exception();
+                                }
+                                sc.nextLine();
+                            } catch (Exception e) {
+                                sc.nextLine();
+                                System.out.printf("\n%s%sSistem menerima input yang tidak valid. Harap masukkan input sesuai pada menu%s\n",
+                                    AnsiColor.RED_BACKGROUND,
+                                    AnsiColor.WHITE_BOLD,
+                                    AnsiColor.RESET
+                                );
+                                continue paymentChoiceCycle;
+                            }
+
+                            boolean isUserSuccessfullyPaid = false;
+
+                            switch(userPymtChoice) {
+                                case 1:
+                                    isUserSuccessfullyPaid = cp.paymentInput(metodePembayaran.QRIS);
+                                    break;
+                                case 2:
+                                    isUserSuccessfullyPaid = cp.paymentInput(metodePembayaran.Kartu_Kredit);
+                                    break;
+                                case 3:
+                                    isUserSuccessfullyPaid = cp.paymentInput(metodePembayaran.Kartu_Debit);
+                                    break;
+                            }
+
+                            if (isUserSuccessfullyPaid) {
+                                cp.setStatusSubs(status.PAID);
+                                Database.daftarPelangganCornerPass.add(cp);
+                            }
+                            break paymentChoiceCycle;
+                        }
+                        break cornerPassInputChoiceCycle;
+                    }
+                    break;
+                // TODO: Case 2: Status Subscription
+                case 2:
+                    int counter = 0;
+                    System.out.printf("\n%sDaftar riwayat subscription Anda%s\n", AnsiColor.CYAN_BOLD, AnsiColor.RESET);
+                    for(CornerPass iterate : Database.daftarPelangganCornerPass) {
+                        if (iterate.getUser().getUsername().equals(this.username)) {
+                            System.out.printf("%d. Kode Pembayaran\t: %s\n", ++counter, iterate.getKodePembayaran());
+                            System.out.printf("%3sPaket yang dipilih\t: %s\n", "", iterate.getSelectedPaket());
+                            System.out.printf("%3sTanggal Subscription\t: %s\n", "", iterate.getSubsTimeStamp());
+                            System.out.printf("%3sTanggal Expired\t: %s\n", "", iterate.getSubsExpiredTime());
+                            System.out.printf("%3sStatus\t\t: %s\n", "", iterate.getStatusSubs());
+                        }
+                    }
+                    if (counter == 0) {
+                        System.out.printf("\n%s%sAnda belum pernah berlangganan Corner Pass!%s\n", AnsiColor.RED_BACKGROUND, AnsiColor.WHITE_BOLD, AnsiColor.RESET);
+                    }
+                case 3 :
+                    break inputCycle;
+            }
+        }
+    }
 
     @Override
     public boolean equals(Object obj) {

@@ -28,6 +28,8 @@ public class Database {
 
     public static LinkedList<Feedback> daftarFeedbacks = new LinkedList<>();
 
+    public static LinkedList<CornerPass> daftarPelangganCornerPass = new LinkedList<>();
+
     public Database() {
         initializeUserData();
         initializeStationData();
@@ -80,6 +82,10 @@ public class Database {
             setDescPC("Core i9 13900K", "32GB DDR5 6400", "Nvidia GeForce RTX 3090Ti", "27\" LG 27GL850 144hz 2560x1440", "Steelseries Apex Pro", "Logitech G502 HERO");
             setGameLists("Forza Horizon 5", "DIRT Rally 2.0", "Grand Theft Auto V", "FIFA 22", "Genshin Impact", "Red Dead Redemption 2", "F1 23", "Love is All Around");
         }});
+    }
+
+    public void initializeCornerPassData() {
+        // Database.daftarPelangganCornerPass.add(new CornerPass(Database.daftarUsers.get(0)));
     }
 
     // public Linked
