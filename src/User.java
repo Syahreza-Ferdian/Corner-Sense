@@ -116,11 +116,16 @@ public class User {
         final int MAX_POSSIBLE_USER_INPUT = 8;
 
         inputCycle: while (true) {
+            boolean isUserSubscribed = this.isUserSubscribed();
             System.out.println("\n=============================================");
             System.out.printf("Selamat datang %s\n", this.getUsername());
 
             @SuppressWarnings("unused")
             Notifikasi ntf = new Notifikasi(this);
+
+            if (isUserSubscribed) {
+                System.out.printf("\n%sUSERINFO: Anda mempunyai subscription Corner Pass! Anda berhak mendapat privilege Corner Pass%s\n", AnsiColor.CYAN_BOLD, AnsiColor.RESET);
+            }
 
             System.out.println("\nMenu Corner Sense: ");
             System.out.printf("%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n",
@@ -130,7 +135,7 @@ public class User {
                 "4. Cancel Booking",
                 "5. Lihat detail device",
                 "6. Corner Pass",
-                "7. Kritik dan Saran",
+                "7. Kritik, Saran dan Request Game",
                 "8. Logout"
             );
             System.out.printf("Input [1 - %d]: ", MAX_POSSIBLE_USER_INPUT);
@@ -215,12 +220,21 @@ public class User {
         }
 
         inputCycle: while(true) {
+            final int MAX_POSSIBLE_USER_INPUT = this.isUserSubscribed() ? Database.daftarJadwal.size() + 2 : Database.daftarJadwal.size() + 1;
+
             lihatJadwal();
+            if (this.isUserSubscribed()) System.out.printf("\n%d.%s[CORNER PASS]%s Input jadwal booking sesuai keinginan Anda: \n", 
+                MAX_POSSIBLE_USER_INPUT - 1,
+                AnsiColor.CYAN_BOLD,
+                AnsiColor.RESET
+            );
+
+            System.out.printf("%d. Batal", MAX_POSSIBLE_USER_INPUT);
             System.out.print("\nPilih salah satu jadwal yang anda inginkan: ");
 
             try {
                 userJadwalInputChoice = sc.nextInt();
-                if (userJadwalInputChoice < 1 || userJadwalInputChoice > Database.daftarJadwal.size()) {
+                if (userJadwalInputChoice < 1 || userJadwalInputChoice > MAX_POSSIBLE_USER_INPUT) {
                     throw new Exception();
                 }
                 sc.nextLine();
@@ -232,6 +246,10 @@ public class User {
                     AnsiColor.RESET
                 );
                 continue inputCycle;
+            }
+
+            if (userJadwalInputChoice == MAX_POSSIBLE_USER_INPUT) {
+                break inputCycle;
             }
 
             userSelectedJdwlBooking = Database.daftarJadwal.get(userJadwalInputChoice - 1);
@@ -337,6 +355,7 @@ public class User {
 
     public void giveFeedback() {
         System.out.printf("\n%sSilakan ketik pesan feedback di bawah ini: %s\n", AnsiColor.CYAN_BOLD, AnsiColor.RESET);
+        System.out.printf("%sNB: Anda dapat juga melakukan request game yang Anda inginkan untuk bisa ditambahkan ke salah satu station di Corner Sense%s\n", AnsiColor.CYAN_BOLD, AnsiColor.RESET);
         System.out.printf("%3s> ", "");
         String feedbackMsg = sc.nextLine();
 
@@ -480,12 +499,15 @@ public class User {
                             switch(userPymtChoice) {
                                 case 1:
                                     isUserSuccessfullyPaid = cp.paymentInput(metodePembayaran.QRIS);
+                                    cp.setSelectedPaymentMethod(metodePembayaran.QRIS);
                                     break;
                                 case 2:
                                     isUserSuccessfullyPaid = cp.paymentInput(metodePembayaran.Kartu_Kredit);
+                                    cp.setSelectedPaymentMethod(metodePembayaran.Kartu_Kredit);
                                     break;
                                 case 3:
                                     isUserSuccessfullyPaid = cp.paymentInput(metodePembayaran.Kartu_Debit);
+                                    cp.setSelectedPaymentMethod(metodePembayaran.Kartu_Debit);
                                     break;
                             }
 
@@ -518,6 +540,15 @@ public class User {
                     break inputCycle;
             }
         }
+    }
+
+    public boolean isUserSubscribed() {
+        for(CornerPass cp : Database.daftarPelangganCornerPass) {
+            if (cp.getUser().getUsername().equals(this.username) && cp.isApproved()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

@@ -145,12 +145,4 @@ public class Jadwal {
         }
         return false;
     }
-
-    // public static void main(String[] args) {
-    //     Database db = new Database();
-    //     Jadwal jdw = new Jadwal();
-    //     // jdw.showStations();
-    //     jdw.showJadwal();
-    //     // jdw.setStationOccupiedBy(1, new User("Syahreza"));
-    // }
 }

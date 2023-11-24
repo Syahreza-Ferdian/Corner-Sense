@@ -30,7 +30,7 @@ public class Login {
             }
 
             if(!isUsernameValid) {
-                System.out.printf("\n%s%sUsername belum terdaftar atau username yang Anda masukkan salah\n%s", AnsiColor.RED_BACKGROUND, AnsiColor.WHITE_BOLD, AnsiColor.RESET);
+                System.out.printf("\n%s%sUsername belum terdaftar atau username yang Anda masukkan salah!%s\n", AnsiColor.RED_BACKGROUND, AnsiColor.WHITE_BOLD, AnsiColor.RESET);
                 ++loginAttempts;
                 continue;
             }

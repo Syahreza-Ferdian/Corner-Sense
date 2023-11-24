@@ -24,7 +24,7 @@ public class Admin extends User {
                 "2. Lihat Semua Jadwal",
                 "3. Lihat Akun Terdaftar",
                 "4. Lihat Semua Booking Aktif",
-                "5. Corner Pass", 
+                "5. Approve Pembayaran Corner Pass", 
                 "6. Respond Feedback",
                 "7. Logout"
             );
@@ -61,6 +61,9 @@ public class Admin extends User {
                     break;
                 case 4:
                     this.showAllBookings();
+                    break;
+                case 5:
+                    this.approveCornerPass();
                     break;
                 case 6:
                     this.respondFeedback();
@@ -202,16 +205,68 @@ public class Admin extends User {
         }
     }
 
-    // public static void main(String[] args) {
-    //     Database db = new Database();
-    //     User usr = Database.daftarUsers.get(0);
-    //     Jadwal jdwl = Database.daftarJadwal.get(0);
-    //     Station sts = Database.daftarStation.get(3);
+    public void showAllCornerPass() {
+        System.out.printf("\n%sDaftar subscription Corner Pass: %s\n", AnsiColor.CYAN_BOLD, AnsiColor.RESET);
+        int counter = 0;
+        for(CornerPass cp : Database.daftarPelangganCornerPass) {
+            System.out.printf("\n%d. User\t\t\t: %s\n", ++counter, cp.getUser().getUsername());
+            System.out.printf("%3sKode Pembayaran\t: %s\n", "", cp.getKodePembayaran());
+            System.out.printf("%3sPaket yang dipilih\t: %s\n", "", cp.getSelectedPaket());
+            System.out.printf("%3sMetode Pembayaran\t: %s\n", "", cp.getSelectedPaymentMethod());
+            System.out.printf("%3sJumlah bayar\t\t: Rp %,.2f\n", "", cp.getSelectedPaket().getHarga());
+            System.out.printf("%3sTanggal Subsciption\t: %s\n", "", cp.getSubsTimeStamp());
+            System.out.printf("%3sTanggal Expired\t: %s\n", "", cp.getSubsExpiredTime());
+            System.out.printf("%3sStatus\t\t: %s\n", "", cp.getStatusSubs());
+            System.out.printf("%3sApproved by\t\t: %s\n", "", cp.isApproved() ? cp.getApprovedBy().getUsername() : "-");
+        }
+    }
 
-    //     Booking bkg = new Booking(usr, jdwl, sts);
-    //     Database.daftarBookings.add(bkg);
+    public void approveCornerPass() {
+        final int MAX_ADM_POSSIBLE_INPUT = Database.daftarPelangganCornerPass.size() + 1;
+        inputCycle: while(true) {
+            System.out.printf("\n%sPilih subscription yang ingin anda Approve: %s\n", AnsiColor.CYAN_BOLD, AnsiColor.RESET);
+            this.showAllCornerPass();
+            System.out.printf("\n%d. Batal\n", MAX_ADM_POSSIBLE_INPUT);
+            System.out.printf("Input [1-%d]: ", MAX_ADM_POSSIBLE_INPUT);
+            int adminApproveChoice;
+            
+            try {
+                adminApproveChoice = sc.nextInt();
+                if (adminApproveChoice < 1 || adminApproveChoice > MAX_ADM_POSSIBLE_INPUT) {
+                    throw new Exception();
+                }
+                sc.nextLine();
+            } catch (Exception e) {
+                sc.nextLine();
+                System.out.printf("\n%s%sSistem mendeteksi input yang tidak valid! Harap masukkan input sesuai menu!%s\n",
+                    AnsiColor.RED_BACKGROUND,
+                    AnsiColor.WHITE_BOLD,
+                    AnsiColor.RESET
+                );
+                continue inputCycle;
+            }
 
-    //     Admin adm = new Admin("Syahreza", "123");
-    //     adm.prompt();
-    // }
+            if (adminApproveChoice == MAX_ADM_POSSIBLE_INPUT) {
+                break inputCycle;
+            }
+
+            if (Database.daftarPelangganCornerPass.get(adminApproveChoice - 1).isApproved()) {
+                System.out.printf("\n%s%sPembayaran Corner Pass tersebut telah di-approve oleh seorang Admin%s\n", 
+                    AnsiColor.RED_BACKGROUND,
+                    AnsiColor.WHITE_BOLD,
+                    AnsiColor.RESET
+                );
+                continue inputCycle;
+            }
+
+            Database.daftarPelangganCornerPass.get(adminApproveChoice - 1).setApprovedBy(this);
+            System.out.printf("\n%s%sBerhasil meng-approve pembayaran Corner Pass atas nama %s!%s\n",
+                AnsiColor.GREEN_BACKGROUND,
+                AnsiColor.WHITE_BOLD,
+                Database.daftarPelangganCornerPass.get(adminApproveChoice - 1).getUser().getUsername(),
+                AnsiColor.RESET
+            );
+            break inputCycle;
+        }
+    }
 }

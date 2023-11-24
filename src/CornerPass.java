@@ -82,6 +82,11 @@ public class CornerPass {
 
     public void setApprovedBy(Admin approvedBy) {
         this.approvedBy = approvedBy;
+        this.setStatusSubs(status.VERIFIED);
+    }
+
+    public Admin getApprovedBy() {
+        return approvedBy;
     }
     
     public void setSelectedPaymentMethod(metodePembayaran selectedPaymentMethod) {
@@ -243,14 +248,6 @@ public class CornerPass {
     public boolean equals(Object obj) {
         return ((CornerPass)obj).kodePembayaran.equals(this.kodePembayaran);
     }
-
-    // public static void main(String[] args) {
-    // //     @SuppressWarnings("unused")
-    // //     Database db = new Database();
-    // //     CornerPass cp = new CornerPass(Database.daftarUsers.get(0), paket.Elite);
-    // //     // cp.showPackageDetails();
-    // //     cp.paymentInput(metodePembayaran.Kartu_Debit);
-    // }
 }
 
 enum paket {

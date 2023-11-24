@@ -117,27 +117,4 @@ public class Station {
     public boolean equals(Object obj) {
         return ((Station)obj).getStationID() == this.getStationID();
     }
-
-    // public static void main(String[] args) {
-    //     Station sts = new Station(1, "PC");
-    //     sts.setDescPC("Core i9 13900K", "32GB DDR5 6400", "Nvidia GeForce RTX 3090Ti", "27\" LG 27GL850 144hz 2560x1440", "Steelseries Apex Pro", "Logitech G502 HERO");
-        
-    //     sts.setGameLists("Forza Horizon 5", "DIRT Rally 2.0", "Grand Theft Auto V", "FIFA 22", "Genshin Impact");
-    //     // sts.showDetailsStation();
-    //     Station sts2 = new Station(2, "PS5");
-    //     sts2.setDesc("x86-64-AMD Ryzen \"Zen 2\"", "GDDR6 16GB", "AMD Radeon RDNA 2-based graphics engine Ray-Tracing Support", "27\" LG 27GL850 144hz 2560x1440", "DualSense Wireless Controller");
-    //     sts2.showDetailsStation();
-    // }
 }
-
-// STATION NUMBER 1:
-// Jenis            : PC/PS5/XBOX
-// Description      :
-//  > Processor     : Core i9 13900K
-//  > RAM           : 32GB DDR5 6400
-//  > GPU           : Nvidia GeForce RTX 3090Ti
-//  > Monitor       : 27" LG 27GL850 144hz 2560x1440
-// Game List        :
-// - Game 1
-// - Game 2
-// - Game 3

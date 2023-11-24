@@ -87,6 +87,4 @@ public class Database {
     public void initializeCornerPassData() {
         // Database.daftarPelangganCornerPass.add(new CornerPass(Database.daftarUsers.get(0)));
     }
-
-    // public Linked
 }
