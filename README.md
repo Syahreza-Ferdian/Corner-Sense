@@ -1,18 +1,22 @@
-## Getting Started
+# Summary
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+Date : 2023-11-26 01:22:05
 
-## Folder Structure
+Directory d:\\!TUGAS KULIAH\\Semester 3\\ADSI\\Corner Sense\\Corner Sense
 
-The workspace contains two folders by default, where:
+Total : 38 files,  2579 codes, 20 comments, 369 blanks, all 2968 lines
 
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
 
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
+## Languages
+| language | files | code | comment | blank | total |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| Java | 37 | 2,569 | 20 | 360 | 2,949 |
+| Markdown | 1 | 10 | 0 | 9 | 19 |
 
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
-
-## Dependency Management
-
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+## Directories
+| path | files | code | comment | blank | total |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| . | 38 | 2,579 | 20 | 369 | 2,968 |
+| . (Files) | 1 | 10 | 0 | 9 | 19 |
+| bin | 24 | 1,003 | 0 | 52 | 1,055 |
+| src | 13 | 1,566 | 20 | 308 | 1,894 |
